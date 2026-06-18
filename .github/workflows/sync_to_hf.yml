@@ -1,17 +1,26 @@
-name: Sync to Hugging Face Spaces
+name: Sync to Hugging Face Hub
 on:
   push:
-    branches: [main] # or master, depending on your default branch
+    branches: [main]
 
 jobs:
-  deploy:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true
-      - name: Push to HF
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://calldbramesh:$HF_TOKEN@huggingface.co/spaces/calldbramesh/datamesh main
+
+      - name: Force delete database from Git tracking before sync
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          rm -f hr_mesh.db
+          git rm --cached hr_mesh.db || true
+          git commit -m "Remove tracking for db file" || true
+
+      - uses: huggingface/hub-sync@v0.1.0
+        with:
+          github_repo_id: ${{ github.repository }}
+          huggingface_repo_id: calldbramesh/datamesh
+          hf_token: ${{ secrets.HF_TOKEN }}
