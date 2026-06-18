@@ -1,1 +1,12 @@
 streamlit
+pandas
+numpy
+plotly
+sqlite-utils
+sqlparse
+streamlit-ace
+networkx
+pyvis
+faker
+grok
+ollama
